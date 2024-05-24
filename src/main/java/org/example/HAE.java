@@ -59,8 +59,8 @@ class HAE {
 
         Map<Integer, List<Integer[]>> equals = new HashMap<>();
         int numberDictionary = 0;
-        for(int i = 0; i < firstParentValue.get(0).size(); i++){
-                for(int k = 0; k < secondParentValue.get(0).size(); k++){
+        for(int i = 0; i < firstParentValue.get(0).size() - 1; i++){
+                for(int k = 0; k < secondParentValue.get(0).size() - 1; k++){
                        Integer firstVertexFirstParent = firstParentValue.get(0).get(i);
                        Integer firstVertexFirstParentSecondCycle = firstParentValue.get(1).get(i);
                        Integer secondVertexFirstParent = firstParentValue.get(0).get(i+1);
