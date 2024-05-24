@@ -106,6 +106,7 @@ class HAE {
                 }
 
         }
+        System.out.println("PO PRZYPISANIU< przed equals.csv");
 
         writeToCsv("equals", equals);
 
@@ -130,13 +131,13 @@ class HAE {
 
         for (Map.Entry<Integer, List<Integer[]>> entry : dictionary.entrySet()) {
             Integer key = entry.getKey();
+            if (entry.getValue() == null){
+                printWriter.printf("%d,%s\n", key, "break");
+                continue;
+            }
             List<Integer[]> pairs = entry.getValue();
             Integer firstVertex = pairs.get(0)[0];
-
-            if (pairs.get(0).length == 1){
-                printWriter.printf("%d,%d\n", key, firstVertex );
-            }
-            else if (pairs.get(0).length == 2){
+            if (pairs.get(0).length == 2){
                 Integer secondVertex = pairs.get(0)[1];
                 printWriter.printf("%d,%d,%d\n", key, firstVertex, secondVertex );
             }
