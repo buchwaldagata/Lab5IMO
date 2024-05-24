@@ -11,13 +11,13 @@ class HAE {
     List<List<Integer>> cycles_Y;
     List<List<Integer>> distanceMatrix;
     Instance kro200;
-    public HAE(Instance kro200){
+    public HAE(Instance kro200) throws IOException {
         this.kro200 = kro200;
         distanceMatrix = kro200.getDistanceMatrix();
         solve();
     }
 //    private List<List<Integer>> solve(){
-    private void solve(){
+    private void solve() throws IOException {
         Map<Double, List<List<Integer>>> map = new HashMap<>();
 
         for (int i = 0; i < 20 ; i++){
@@ -59,7 +59,7 @@ class HAE {
 
         Map<Integer, List<Integer[]>> equals = new HashMap<>();
         int numberDictionary = 0;
-        for(int i = 0; i < firstParentValue.get(0).size() - 1; i++){
+        for(int i = 0; i < firstParentValue.get(0).size() - 1; i++){ // todo sprawdz czy dobrze z tymi -1
                 for(int k = 0; k < secondParentValue.get(0).size() - 1; k++){
                        Integer firstVertexFirstParent = firstParentValue.get(0).get(i);
                        Integer firstVertexFirstParentSecondCycle = firstParentValue.get(1).get(i);
@@ -69,7 +69,7 @@ class HAE {
                        Integer firstVertexSecondParentSecondCycle = secondParentValue.get(1).get(k);
                        Integer secondVertexSecondParent = secondParentValue.get(0).get(k+1);
                        Integer secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k+1);
-
+//todo: narazie wszystko razem, jak zrobic zeby bylo oddzielone
 
                        List<Integer[]> list = new ArrayList<>();
 
@@ -77,20 +77,28 @@ class HAE {
                            list.add(new Integer[]{firstVertexFirstParent, secondVertexFirstParent});
                            equals.put(numberDictionary, list);
                            numberDictionary++;
+                           equals.put(numberDictionary, null);
+                           numberDictionary++;
                        }
                        else if (firstVertexFirstParentSecondCycle == firstVertexSecondParentSecondCycle && secondVertexFirstParentSecondCycle == secondVertexSecondParentSecondCycle) {
                            list.add(new Integer[]{firstVertexFirstParentSecondCycle, secondVertexFirstParentSecondCycle});
                            equals.put(numberDictionary, list);
+                           numberDictionary++;
+                           equals.put(numberDictionary, null);
                            numberDictionary++;
                        }
                        else if (firstVertexFirstParent == firstVertexSecondParentSecondCycle && secondVertexFirstParent == secondVertexSecondParentSecondCycle){
                            list.add(new Integer[]{firstVertexFirstParent, secondVertexFirstParent});
                            equals.put(numberDictionary, list);
                            numberDictionary++;
+                           equals.put(numberDictionary, null);
+                           numberDictionary++;
                        }
                        else if (firstVertexFirstParentSecondCycle == firstVertexSecondParent && secondVertexFirstParentSecondCycle == secondVertexSecondParent){
                             list.add(new Integer[]{firstVertexFirstParentSecondCycle, secondVertexFirstParentSecondCycle});
                             equals.put(numberDictionary, list);
+                            numberDictionary++;
+                            equals.put(numberDictionary, null);
                             numberDictionary++;
                        }
 
@@ -98,6 +106,8 @@ class HAE {
                 }
 
         }
+
+        writeToCsv("equals", equals);
 
 
         
@@ -113,20 +123,39 @@ class HAE {
         length += distanceMatrix.get(solution.get(solution.size() - 1)).get(solution.get(0));
         return length;
     }
+        public void writeToCsv(String path, Map<Integer, List<Integer[]>> dictionary) throws IOException {
+        FileWriter fileWriter = new FileWriter(path);
+        PrintWriter printWriter = new PrintWriter(fileWriter);
+        printWriter.print("number, edge_A, edge_B\n");
 
-//    public void solutionToCsv(String path) throws IOException {
-//        FileWriter fileWriter = new FileWriter(path);
-//        PrintWriter printWriter = new PrintWriter(fileWriter);
-//        printWriter.print("cycle,x,y\n");
-//        for (Integer a : cycles_X.get(0)) {
-//            printWriter.printf("%s,%d,%d\n","a", instance.coordinates.get(a).getKey(), instance.coordinates.get(a).getValue());
+        for (Map.Entry<Integer, List<Integer[]>> entry : dictionary.entrySet()) {
+            Integer key = entry.getKey();
+            List<Integer[]> pairs = entry.getValue();
+            Integer firstVertex = pairs.get(0)[0];
+
+            if (pairs.get(0).length == 1){
+                printWriter.printf("%d,%d\n", key, firstVertex );
+            }
+            else if (pairs.get(0).length == 2){
+                Integer secondVertex = pairs.get(0)[1];
+                printWriter.printf("%d,%d,%d\n", key, firstVertex, secondVertex );
+            }
+            else{
+                System.out.println("COS NIE TAK");
+            }
+
+        }
+
+
+//                for (Integer a : dictionary) {
+//            printWriter.printf("%d,%d,%d\n", dictionary.get(a).get(0)[0], dictionary.get(a).get(0)[1] );
 //        }
 //        printWriter.printf("%s,%d,%d\n","a", instance.coordinates.get(cycles_X.get(0).get(0)).getKey(), instance.coordinates.get(cycles_X.get(0).get(0)).getValue());
 //        for (Integer a : cycles_X.get(1)) {
 //            printWriter.printf("%s,%d,%d\n","b", instance.coordinates.get(a).getKey(), instance.coordinates.get(a).getValue());
 //        }
 //        printWriter.printf("%s,%d,%d\n","b", instance.coordinates.get(cycles_X.get(1).get(0)).getKey(), instance.coordinates.get(cycles_X.get(1).get(0)).getValue());
-//        printWriter.close();
-//    }
+        printWriter.close();
+    }
 
 }
