@@ -63,16 +63,45 @@ class HAE {
 //        List<Integer> listOfInteger = new ArrayList<Integer>();
         List<List<Integer>> cycle_1 = new ArrayList<>();
         int numberDictionary = 0;
-        for (int i = 0; i < firstParentValue.get(0).size() - 1; i++) { // todo sprawdz czy dobrze z tymi -1
-            for (int k = 0; k < secondParentValue.get(0).size() - 1; k++) {
+        for (int i = 0; i < firstParentValue.get(0).size() ; i++) { // todo sprawdz czy dobrze z tymi -1
+            for (int k = 0; k < secondParentValue.get(0).size() ; k++) {
                 Integer firstVertexFirstParent = firstParentValue.get(0).get(i);
                 Integer firstVertexFirstParentSecondCycle = firstParentValue.get(1).get(i);
-                Integer secondVertexFirstParent = firstParentValue.get(0).get(i + 1);
-                Integer secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(i + 1);
+                Integer secondVertexFirstParent;
+                Integer secondVertexFirstParentSecondCycle;
                 Integer firstVertexSecondParent = secondParentValue.get(0).get(k);
                 Integer firstVertexSecondParentSecondCycle = secondParentValue.get(1).get(k);
-                Integer secondVertexSecondParent = secondParentValue.get(0).get(k + 1);
-                Integer secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k + 1);
+                Integer secondVertexSecondParent;
+                Integer secondVertexSecondParentSecondCycle;
+
+
+                if(i == firstParentValue.get(0).size() - 1 && k == secondParentValue.get(0).size() - 1 ){
+                    secondVertexFirstParent = firstParentValue.get(0).get(0);
+                    secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(0);
+                    secondVertexSecondParent = secondParentValue.get(0).get(0);
+                    secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(0);
+                }
+                else if (i == firstParentValue.get(0).size() - 1){
+                    secondVertexFirstParent = firstParentValue.get(0).get(0);
+                    secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(0);
+                    secondVertexSecondParent = secondParentValue.get(0).get(k + 1);
+                    secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k + 1);
+                }
+                else if(k == secondParentValue.get(0).size() - 1){
+                    secondVertexFirstParent = firstParentValue.get(0).get(i + 1);
+                    secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(i + 1);
+                    secondVertexSecondParent = secondParentValue.get(0).get(0);
+                    secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(0);
+                }
+                else {
+                    secondVertexFirstParent = firstParentValue.get(0).get(i + 1);
+                    secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(i + 1);
+                    secondVertexSecondParent = secondParentValue.get(0).get(k + 1);
+                    secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k + 1);
+                }
+
+
+
 //todo: narazie wszystko razem, jak zrobic zeby bylo oddzielone
 
                 List<Integer> list = new ArrayList<>();
@@ -82,47 +111,23 @@ class HAE {
                     list.add(firstVertexFirstParent);
                     list.add(secondVertexFirstParent);
                     cycle_0.add(list);
-//                    equals.put(0, list);
-//                    numberDictionary++;
-//                           keys_null.add(new Integer[]{numberDictionary,1000});
-//                           equals.put(keys_null, null);
-//                           numberDictionary++;
+
                 } else if (firstVertexFirstParentSecondCycle == firstVertexSecondParentSecondCycle && secondVertexFirstParentSecondCycle == secondVertexSecondParentSecondCycle) {
                     list.add(firstVertexFirstParentSecondCycle);
                     list.add(secondVertexFirstParentSecondCycle);
                     cycle_1.add(list);
-//
-//                    list.add(new Integer[]{firstVertexFirstParentSecondCycle, secondVertexFirstParentSecondCycle});
-////                           keys.add(new Integer[]{numberDictionary, 1});
-//                    equals.put(1, list);
-//                    numberDictionary++;
-//                           keys_null.add(new Integer[]{numberDictionary,1000});
-//                           equals.put(keys_null, null);
-//                           numberDictionary++;
+
                 } else if (firstVertexFirstParent == firstVertexSecondParentSecondCycle && secondVertexFirstParent == secondVertexSecondParentSecondCycle) {
                     list.add(firstVertexFirstParent);
                     list.add(secondVertexFirstParent);
                     cycle_0.add(list);
 
-//                    list.add(new Integer[]{firstVertexFirstParent, secondVertexFirstParent});
-////                           keys.add(new Integer[]{numberDictionary, 0});
-//                    equals.put(0, list);
-//                    numberDictionary++;
-//                           keys_null.add(new Integer[]{numberDictionary,1000});
-//                           equals.put(keys_null, null);
-//                           numberDictionary++;
+
                 } else if (firstVertexFirstParentSecondCycle == firstVertexSecondParent && secondVertexFirstParentSecondCycle == secondVertexSecondParent) {
                     list.add(firstVertexFirstParentSecondCycle);
                     list.add(secondVertexFirstParentSecondCycle);
                     cycle_0.add(list);
 
-//                    list.add(new Integer[]{firstVertexFirstParentSecondCycle, secondVertexFirstParentSecondCycle});
-////                           keys.add(new Integer[]{numberDictionary, 0});
-//                    equals.put(0, list);
-//                    numberDictionary++;
-//                            keys_null.add(new Integer[]{numberDictionary,1000});
-//                            equals.put(keys_null, null);
-//                            numberDictionary++;
                 }
 
 
