@@ -62,7 +62,6 @@ class HAE {
         List<List<Integer>> cycle_0 = new ArrayList<>();
 //        List<Integer> listOfInteger = new ArrayList<Integer>();
         List<List<Integer>> cycle_1 = new ArrayList<>();
-        int numberDictionary = 0;
         for (int i = 0; i < firstParentValue.get(0).size() ; i++) { // todo sprawdz czy dobrze z tymi -1
             for (int k = 0; k < secondParentValue.get(0).size() ; k++) {
                 Integer firstVertexFirstParent = firstParentValue.get(0).get(i);
@@ -100,14 +99,10 @@ class HAE {
                     secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k + 1);
                 }
 
-
-
 //todo: narazie wszystko razem, jak zrobic zeby bylo oddzielone
 
                 List<Integer> list = new ArrayList<>();
                 if (firstVertexFirstParent == firstVertexSecondParent && secondVertexFirstParent == secondVertexSecondParent) {
-
-
                     list.add(firstVertexFirstParent);
                     list.add(secondVertexFirstParent);
                     cycle_0.add(list);
@@ -135,50 +130,39 @@ class HAE {
 
         }
         System.out.println("PO PRZYPISANIU< przed equals.csv");
-        int size = 1;
-        List<List<Integer>> the_longest_edge = new ArrayList<>();
-        List<Integer> tmp_list = new ArrayList<>();
+
+
+        List<List<Integer>> list_of_edges = new ArrayList<>();
+
         for(int i = 0; i < cycle_0.size(); i++){
-            for (int j = 0 ; j < cycle_0.size() ; j++){
-                if (cycle_0.get(i).get(0) == cycle_0.get(j).get(0)){
-                    tmp_list.add(cycle_0.get(i).get(1));
-                    tmp_list.add(cycle_0.get(i).get(0));
-                    tmp_list.add(cycle_0.get(j).get(1));
-                    the_longest_edge.add(tmp_list);
-                    size = 2;
-                }
-                if (cycle_0.get(i).get(1) == cycle_0.get(j).get(1)){
-                    tmp_list.add(cycle_0.get(i).get(0));
-                    tmp_list.add(cycle_0.get(i).get(1));
-                    tmp_list.add(cycle_0.get(j).get(0));
+            for (int j = cycle_0.size() - 1 ; j >=0 ; j--){
+                List<Integer> temporary_list = new ArrayList<>();
+                Integer first_in_first = cycle_0.get(i).get(0);
+                Integer second_in_first = cycle_0.get(i).get(1);
+                Integer first_in_second = cycle_0.get(j).get(0);
+                Integer second_in_second = cycle_0.get(j).get(1);
 
-                    the_longest_edge.add(tmp_list);
-                    size = 2;
+                if(i != j ){
+                    if (first_in_first == first_in_second){
+                        temporary_list.add(second_in_first);
+                        temporary_list.add(first_in_first);
+                        temporary_list.add(second_in_second);
+                        list_of_edges.add(temporary_list);
+                    }
+                    if (first_in_first == second_in_second){
+                        temporary_list.add(second_in_first);
+                        temporary_list.add(first_in_first);
+                        temporary_list.add(first_in_second);
+                        list_of_edges.add(temporary_list);
+                    }
                 }
 
-                if (cycle_0.get(i).get(0) == cycle_0.get(j).get(1)){
-                    tmp_list.add(cycle_0.get(i).get(1));
-                    tmp_list.add(cycle_0.get(i).get(0));
-                    tmp_list.add(cycle_0.get(j).get(0));
-                    the_longest_edge.add(tmp_list);
-                    size = 2;
-                }
-                if (cycle_0.get(i).get(1) == cycle_0.get(j).get(0)){
-                    tmp_list.add(cycle_0.get(i).get(0));
-                    tmp_list.add(cycle_0.get(i).get(1));
-                    tmp_list.add(cycle_0.get(j).get(1));
-                    the_longest_edge.add(tmp_list);
-                    size = 2;
-                }
 
             }
         }
 
+        System.out.println("SKONCZONE");
 
-//        for (int i = 0; i < equals.keySet().size(); i++){
-//            if (equals.get(i);
-//            ))
-//    }
     }
 
 //        writeToCsv("equals", equals);
@@ -186,7 +170,7 @@ class HAE {
 
         
 
-//        System.out.println("SKONCZONE");
+
 //    }
 
     private double calcCycleLength(List<Integer> solution){
