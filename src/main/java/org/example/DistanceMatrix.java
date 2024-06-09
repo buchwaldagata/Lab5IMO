@@ -11,7 +11,7 @@ class DistanceMatrix {
 
 
     private static Long[][] countEuclideanDistanceFromFile(int[][] intCoordinateList){
-        Long[][] distanceMatrix = new Long[100][100];
+        Long[][] distanceMatrix = new Long[intCoordinateList.length][intCoordinateList.length];
         if (intCoordinateList.length > 1) {
             for (int i = 0; i < intCoordinateList.length; i++) {
                 for (int j = 0; j < intCoordinateList.length; j++){

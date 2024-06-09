@@ -25,7 +25,7 @@ public class CoordinateList {
                 List<String> correctLine = new ArrayList<>();
                 correctLine.add(line);
                 count++;
-                if (count > 5 && count < 106) { //todo: change 5 and 106
+                if (count > 5 && count < 206) { //todo: change 5 and 106
                     correctsLines.add(correctLine);
                 }
             }
@@ -67,7 +67,7 @@ public class CoordinateList {
             }
         }
 
-        for (int i = 0; i < 100; i++){
+        for (int i = 0; i < 200; i++){
             table[i][0] = table[i][0]-1;
         }
 

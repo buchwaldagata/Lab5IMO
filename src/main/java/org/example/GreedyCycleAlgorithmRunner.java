@@ -5,7 +5,7 @@ import java.util.Map;
 
 public class GreedyCycleAlgorithmRunner {
     public static void run() {
-        CoordinateList coordinateList = new CoordinateList("src/main/resources/kroA200.tsp");
+        CoordinateList coordinateList = new CoordinateList("src/main/resources/kroB200.tsp");
         int[][] intCoordinateList = coordinateList.intCoordinateList;
         DistanceMatrix distanceMatrix = new DistanceMatrix(intCoordinateList);
         Long[][] distanceMatrix2 = distanceMatrix.distanceMatrix;
@@ -23,7 +23,7 @@ public class GreedyCycleAlgorithmRunner {
             }
             if (lenGreedyCycle < minGreedyCycle){
                 minGreedyCycle = lenGreedyCycle;
-                minIndexGreedyCycle = i;
+                minIndexGreedyCycle = i*2;
             }
             totalLengthGreedyCycle+= lenGreedyCycle;
         }
