@@ -4,24 +4,24 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.*;
+import java.util.stream.IntStream;
 
 class HAE {
 
     List<List<Integer>> cycles_X;
-    List<List<Integer>> distanceMatrix;
     Double bestCyclesLength = 0.0;
     Instance kro200;
     public HAE(Instance kro200) throws IOException {
         this.kro200 = kro200;
-        distanceMatrix = kro200.getDistanceMatrix();
         solve();
     }
-    //    private List<List<Integer>> solve(){
+
     private void solve() throws IOException {
         long startTime = System.currentTimeMillis();
         Map<Double, List<List<Integer>>> population = new HashMap<>();
 
-        for (int i = 0; i < 20; i++) {
+        int populationSize = 20;
+        for (int i = 0; i < populationSize; i++) {
             cycles_X = new RandomStart().getCycles();
             cycles_X = new CandidatesMoves(kro200, cycles_X).cycles;
             Double key = calcCycleLength(cycles_X.get(0)) + calcCycleLength(cycles_X.get(1));
@@ -33,175 +33,188 @@ class HAE {
         }
 
         int iterations = 0;
-        while (System.currentTimeMillis() - startTime < 21527) {
-            iterations++;
-            //wylosowanie rodziców
-            Random random = new Random();
-            Double firstParentKey = 0.0;
-            List<List<Integer>> firstParentValue = null;
-            Double secondParentKey = 0.0;
-            List<List<Integer>> secondParentValue = null;
+        while (System.currentTimeMillis() - startTime < 94114) {
+            try {
 
-            while (true) {
-                int randomNumber = random.nextInt(20);
-                int secondRandomNumber = random.nextInt(20);
-                int number = 0;
-                if (randomNumber != secondRandomNumber) {
-                    for (Map.Entry<Double, List<List<Integer>>> i : population.entrySet()) {
-                        if (number == randomNumber) {
-                            firstParentKey = i.getKey();
-                            firstParentValue = i.getValue();
+                //wylosowanie rodziców
+                Random random = new Random();
+                Double firstParentKey = 0.0;
+                Double secondParentKey = 0.0;
+
+                int randomNumber;
+                int secondRandomNumber;
+                while (true) {
+                    randomNumber = random.nextInt(populationSize);
+                    secondRandomNumber = random.nextInt(populationSize);
+                    int number = 0;
+                    if (randomNumber != secondRandomNumber) {
+                        for (Map.Entry<Double, List<List<Integer>>> i : population.entrySet()) {
+                            if (number == randomNumber) {
+                                firstParentKey = i.getKey();
+                            }
+                            if (number == secondRandomNumber) {
+                                secondParentKey = i.getKey();
+                            }
+                            number++;
                         }
-                        if (number == secondRandomNumber) {
-                            secondParentKey = i.getKey();
-                            secondParentValue = i.getValue();
-                        }
-                        number++;
-                    }
-                    break;
-                }
-            }
-
-            List<List<Integer>> cycle_0 = new ArrayList<>();
-//        List<Integer> listOfInteger = new ArrayList<Integer>();
-            List<List<Integer>> cycle_1 = new ArrayList<>();
-            for (int i = 0; i < firstParentValue.get(0).size(); i++) { // todo sprawdz czy dobrze z tymi -1
-                for (int k = 0; k < secondParentValue.get(0).size(); k++) {
-                    Integer firstVertexFirstParent = firstParentValue.get(0).get(i);
-                    Integer firstVertexFirstParentSecondCycle = firstParentValue.get(1).get(i);
-                    Integer secondVertexFirstParent;
-                    Integer secondVertexFirstParentSecondCycle;
-                    Integer firstVertexSecondParent = secondParentValue.get(0).get(k);
-                    Integer firstVertexSecondParentSecondCycle = secondParentValue.get(1).get(k);
-                    Integer secondVertexSecondParent;
-                    Integer secondVertexSecondParentSecondCycle;
-
-
-                    if (i == firstParentValue.get(0).size() - 1 && k == secondParentValue.get(0).size() - 1) {
-                        secondVertexFirstParent = firstParentValue.get(0).get(0);
-                        secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(0);
-                        secondVertexSecondParent = secondParentValue.get(0).get(0);
-                        secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(0);
-                    } else if (i == firstParentValue.get(0).size() - 1) {
-                        secondVertexFirstParent = firstParentValue.get(0).get(0);
-                        secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(0);
-                        secondVertexSecondParent = secondParentValue.get(0).get(k + 1);
-                        secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k + 1);
-                    } else if (k == secondParentValue.get(0).size() - 1) {
-                        secondVertexFirstParent = firstParentValue.get(0).get(i + 1);
-                        secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(i + 1);
-                        secondVertexSecondParent = secondParentValue.get(0).get(0);
-                        secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(0);
-                    } else {
-                        secondVertexFirstParent = firstParentValue.get(0).get(i + 1);
-                        secondVertexFirstParentSecondCycle = firstParentValue.get(1).get(i + 1);
-                        secondVertexSecondParent = secondParentValue.get(0).get(k + 1);
-                        secondVertexSecondParentSecondCycle = secondParentValue.get(1).get(k + 1);
-                    }
-
-//sortowanie podwjnych krawedzi
-
-                    if (firstVertexFirstParent > secondVertexFirstParent) {
-                        int tmp = firstVertexFirstParent;
-                        firstVertexFirstParent = secondVertexFirstParent;
-                        secondVertexFirstParent = tmp;
-                    }
-
-                    if (firstVertexFirstParentSecondCycle > secondVertexFirstParentSecondCycle) {
-                        int tmp = firstVertexFirstParentSecondCycle;
-                        firstVertexFirstParentSecondCycle = secondVertexFirstParentSecondCycle;
-                        secondVertexFirstParentSecondCycle = tmp;
-                    }
-
-                    if (firstVertexSecondParent > secondVertexSecondParent) {
-                        int tmp = firstVertexSecondParent;
-                        firstVertexSecondParent = secondVertexSecondParent;
-                        secondVertexSecondParent = tmp;
-                    }
-
-                    if (firstVertexSecondParentSecondCycle > secondVertexSecondParentSecondCycle) {
-                        int tmp = firstVertexSecondParentSecondCycle;
-                        firstVertexSecondParentSecondCycle = secondVertexSecondParentSecondCycle;
-                        secondVertexSecondParentSecondCycle = tmp;
-                    }
-
-                    List<Integer> list = new ArrayList<>();
-                    if (firstVertexFirstParent == firstVertexSecondParent && secondVertexFirstParent == secondVertexSecondParent) {
-                        list.add(firstVertexFirstParent);
-                        list.add(secondVertexFirstParent);
-                        cycle_0.add(list);
-
-                    } else if (firstVertexFirstParentSecondCycle == firstVertexSecondParentSecondCycle && secondVertexFirstParentSecondCycle == secondVertexSecondParentSecondCycle) {
-                        list.add(firstVertexFirstParentSecondCycle);
-                        list.add(secondVertexFirstParentSecondCycle);
-                        cycle_1.add(list);
-
-                    } else if (firstVertexFirstParent == firstVertexSecondParentSecondCycle && secondVertexFirstParent == secondVertexSecondParentSecondCycle) {
-                        list.add(firstVertexFirstParent);
-                        list.add(secondVertexFirstParent);
-                        cycle_0.add(list);
-
-
-                    } else if (firstVertexFirstParentSecondCycle == firstVertexSecondParent && secondVertexFirstParentSecondCycle == secondVertexSecondParent) {
-                        list.add(firstVertexFirstParentSecondCycle);
-                        list.add(secondVertexFirstParentSecondCycle);
-                        cycle_0.add(list);
-
-                    }
-                }
-            }
-
-            expandEdges(cycle_0);
-            expandEdges(cycle_1);
-
-            //pewtla po wierzcholkach, sprawdzenie czy wierzhcolek nalezy juz do jakiejs krawedzi
-            List<List<Integer>> edges = new ArrayList<>();
-            int verticesNumber = kro200.getDistanceMatrix().size();
-            for (int vertex = 0; vertex < verticesNumber; vertex++) {
-                boolean isVertexAssigned = false;
-                for (List<Integer> edge : cycle_0) {
-                    if (edge.contains(vertex)) {
-                        isVertexAssigned = true;
                         break;
                     }
                 }
-                if (!isVertexAssigned) {
-                    for (List<Integer> edge : cycle_1) {
+
+                List<List<Integer>> cycle_0 = new ArrayList<>();
+                List<List<Integer>> cycle_1 = new ArrayList<>();
+                int firstParentValueSize = population.get(firstParentKey).get(0).size();
+                int secondParentValueSize = population.get(secondParentKey).get(0).size();
+
+                Double finalFirstParentKey = firstParentKey;
+                Double finalSecondParentKey = secondParentKey;
+                IntStream.range(0, firstParentValueSize).parallel().forEach(i -> {
+                    IntStream.range(0, secondParentValueSize).parallel().forEach(k -> {
+                        Integer firstVertexFirstParent = population.get(finalFirstParentKey).get(0).get(i);
+                        Integer firstVertexFirstParentSecondCycle = population.get(finalFirstParentKey).get(1).get(i);
+                        Integer secondVertexFirstParent;
+                        Integer secondVertexFirstParentSecondCycle;
+                        Integer firstVertexSecondParent = population.get(finalSecondParentKey).get(0).get(k);
+                        Integer firstVertexSecondParentSecondCycle = population.get(finalSecondParentKey).get(1).get(k);
+                        Integer secondVertexSecondParent;
+                        Integer secondVertexSecondParentSecondCycle;
+
+
+                        if (i == firstParentValueSize - 1 && k == secondParentValueSize - 1) {
+                            secondVertexFirstParent = population.get(finalFirstParentKey).get(0).get(0);
+                            secondVertexFirstParentSecondCycle = population.get(finalFirstParentKey).get(1).get(0);
+                            secondVertexSecondParent = population.get(finalSecondParentKey).get(0).get(0);
+                            secondVertexSecondParentSecondCycle = population.get(finalSecondParentKey).get(1).get(0);
+                        } else if (i == firstParentValueSize - 1) {
+                            secondVertexFirstParent = population.get(finalFirstParentKey).get(0).get(0);
+                            secondVertexFirstParentSecondCycle = population.get(finalFirstParentKey).get(1).get(0);
+                            secondVertexSecondParent = population.get(finalSecondParentKey).get(0).get(k + 1);
+                            secondVertexSecondParentSecondCycle = population.get(finalSecondParentKey).get(1).get(k + 1);
+                        } else if (k == secondParentValueSize - 1) {
+                            secondVertexFirstParent = population.get(finalFirstParentKey).get(0).get(i + 1);
+                            secondVertexFirstParentSecondCycle = population.get(finalFirstParentKey).get(1).get(i + 1);
+                            secondVertexSecondParent = population.get(finalSecondParentKey).get(0).get(0);
+                            secondVertexSecondParentSecondCycle = population.get(finalSecondParentKey).get(1).get(0);
+                        } else {
+                            secondVertexFirstParent = population.get(finalFirstParentKey).get(0).get(i + 1);
+                            secondVertexFirstParentSecondCycle = population.get(finalFirstParentKey).get(1).get(i + 1);
+                            secondVertexSecondParent = population.get(finalSecondParentKey).get(0).get(k + 1);
+                            secondVertexSecondParentSecondCycle = population.get(finalSecondParentKey).get(1).get(k + 1);
+                        }
+
+
+                        if (firstVertexFirstParent > secondVertexFirstParent) {
+                            int tmp = firstVertexFirstParent;
+                            firstVertexFirstParent = secondVertexFirstParent;
+                            secondVertexFirstParent = tmp;
+                        }
+
+                        if (firstVertexFirstParentSecondCycle > secondVertexFirstParentSecondCycle) {
+                            int tmp = firstVertexFirstParentSecondCycle;
+                            firstVertexFirstParentSecondCycle = secondVertexFirstParentSecondCycle;
+                            secondVertexFirstParentSecondCycle = tmp;
+                        }
+
+                        if (firstVertexSecondParent > secondVertexSecondParent) {
+                            int tmp = firstVertexSecondParent;
+                            firstVertexSecondParent = secondVertexSecondParent;
+                            secondVertexSecondParent = tmp;
+                        }
+
+                        if (firstVertexSecondParentSecondCycle > secondVertexSecondParentSecondCycle) {
+                            int tmp = firstVertexSecondParentSecondCycle;
+                            firstVertexSecondParentSecondCycle = secondVertexSecondParentSecondCycle;
+                            secondVertexSecondParentSecondCycle = tmp;
+                        }
+
+                        synchronized (cycle_0) {
+                            synchronized (cycle_1) {
+                                List<Integer> list = new ArrayList<>();
+                                if (firstVertexFirstParent == firstVertexSecondParent && secondVertexFirstParent == secondVertexSecondParent) {
+                                    list.add(firstVertexFirstParent);
+                                    list.add(secondVertexFirstParent);
+                                    cycle_0.add(list);
+
+                                } else if (firstVertexFirstParentSecondCycle == firstVertexSecondParentSecondCycle && secondVertexFirstParentSecondCycle == secondVertexSecondParentSecondCycle) {
+                                    list.add(firstVertexFirstParentSecondCycle);
+                                    list.add(secondVertexFirstParentSecondCycle);
+                                    cycle_1.add(list);
+
+                                } else if (firstVertexFirstParent == firstVertexSecondParentSecondCycle && secondVertexFirstParent == secondVertexSecondParentSecondCycle) {
+                                    list.add(firstVertexFirstParent);
+                                    list.add(secondVertexFirstParent);
+                                    cycle_0.add(list);
+
+
+                                } else if (firstVertexFirstParentSecondCycle == firstVertexSecondParent && secondVertexFirstParentSecondCycle == secondVertexSecondParent) {
+                                    list.add(firstVertexFirstParentSecondCycle);
+                                    list.add(secondVertexFirstParentSecondCycle);
+                                    cycle_0.add(list);
+
+                                }
+                            }
+                        }
+                    });
+                });
+
+                expandEdges(cycle_0);
+                expandEdges(cycle_1);
+
+
+                //pewtla po wierzcholkach, sprawdzenie czy wierzhcolek nalezy juz do jakiejs krawedzi
+                List<List<Integer>> edges = new ArrayList<>();
+                int verticesNumber = kro200.getDistanceMatrix().size();
+                for (int vertex = 0; vertex < verticesNumber; vertex++) {
+                    boolean isVertexAssigned = false;
+                    for (List<Integer> edge : cycle_0) {
                         if (edge.contains(vertex)) {
                             isVertexAssigned = true;
                             break;
                         }
                     }
+                    if (!isVertexAssigned) {
+                        for (List<Integer> edge : cycle_1) {
+                            if (edge.contains(vertex)) {
+                                isVertexAssigned = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!isVertexAssigned) {
+                        List<Integer> newEdge = new ArrayList<>();
+                        newEdge.add(vertex);
+                        edges.add(newEdge);
+                    }
                 }
-                if (!isVertexAssigned) {
-                    List<Integer> newEdge = new ArrayList<>();
-                    newEdge.add(vertex);
-                    edges.add(newEdge);
+
+
+                //dodanie bezpanskich krawedzi i stworzenie z najdluzszej cyklu
+                List<Integer> cycle_0_final = createCycle(cycle_0, edges, population.get(firstParentKey), 0);
+                List<Integer> cycle_1_final = createCycle(cycle_1, edges, population.get(firstParentKey), 1);
+
+                greedyCycle(edges, cycle_0_final, cycle_1_final);
+
+                List<List<Integer>> childValue = new ArrayList<>();
+                childValue.add(cycle_0_final);
+                childValue.add(cycle_1_final);
+//                opcjonalnie
+//                new CandidatesMoves(kro200, childValue);
+
+
+                Double childKey = calcCycleLength(childValue.get(0)) + calcCycleLength(childValue.get(1));
+                Double biggestKey = -1.0;
+                for(Double key: population.keySet()) {
+                    if(key > biggestKey) {
+                        biggestKey = key;
+                    }
                 }
-            }
-
-            //dodanie bezpanskich krawedzi i stworzenie z najdluzszej cyklu
-            List<Integer> cycle_0_final = createCycle(cycle_0, edges, firstParentValue, 0);
-            List<Integer> cycle_1_final = createCycle(cycle_1, edges, firstParentValue, 1);
-
-            greedyCycle(edges, cycle_0_final, cycle_1_final);
-
-            List<List<Integer>> childValue = new ArrayList<>();
-            childValue.add(cycle_0_final);
-            childValue.add(cycle_1_final);
-            childValue = new CandidatesMoves(kro200, childValue).cycles;
-
-            Double childKey = calcCycleLength(cycle_0_final) + calcCycleLength(cycle_1_final);
-            Double biggestKey = -1.0;
-            for(Double key: population.keySet()) {
-                if(key > biggestKey) {
-                    biggestKey = key;
+                if(childKey<biggestKey) {
+                    population.remove(biggestKey);
+                    population.put(childKey, childValue);
                 }
-            }
-            if(childKey<biggestKey) {
-                population.remove(biggestKey);
-                population.put(childKey, childValue);
-            }
+
+                iterations++;
+            } catch (Exception e) {}
         }
         Double smallestKey = Double.MAX_VALUE;
         for(Double key: population.keySet()) {
@@ -235,11 +248,21 @@ class HAE {
         }
         //gdy rodzice nie maja wspolnych krawedzi
         if(maxLengthIndex == -1) {
-            int firstVertex = firstParentValue.get(cyclerNumber).get(0);
-            int secondVertex = firstParentValue.get(cyclerNumber).get(1);
-            cycle_final.add(firstVertex);
-            cycle_final.add(secondVertex);
-            edges.removeIf(j -> j.get(0).equals(firstVertex) || j.get(0).equals(secondVertex));
+            for (int j=0; j<edges.size(); j++) {
+                List<Integer> edge = edges.get(j);
+                if(edge.size()>1) {
+                    cycle_final = edge;
+                    edges.remove(j);
+                    break;
+                }
+            }
+            if(cycle_final.isEmpty()) {
+                cycle_final.add(edges.get(0).get(0));
+                cycle_final.add(edges.get(1).get(0));
+                edges.remove(0);
+                edges.remove(1);
+            }
+
         }
         return cycle_final;
     }
@@ -297,14 +320,21 @@ class HAE {
     private double calcCycleLength(List<Integer> solution){
         double length = 0;
         for(int i= 0; i<solution.size()-1; i++){
-            length += distanceMatrix.get(solution.get(i)).get(solution.get(i+1));
+            length += kro200.getDistanceMatrix().get(solution.get(i)).get(solution.get(i+1));
         }
-        length += distanceMatrix.get(solution.get(solution.size() - 1)).get(solution.get(0));
+        length += kro200.getDistanceMatrix().get(solution.get(solution.size() - 1)).get(solution.get(0));
         return length;
     }
 
 
     private void greedyCycle(List<List<Integer>> edges, List<Integer> cycle0, List<Integer> cycle1){
+        List<Integer> test = new ArrayList<>();
+        test.addAll(cycle0);
+        test.addAll(cycle1);
+        for (List<Integer> edge: edges) {
+            test.addAll(edge);
+        }
+
         while (true){
             if(edges.isEmpty()) {
                 break;
@@ -340,7 +370,7 @@ class HAE {
             } else {
                 toVertexToCycle = toCycle.get(i+1);
             }
-            Integer oldCostFromCycle = distanceMatrix.get(fromVertexToCycle).get(toVertexToCycle);
+            Integer oldCostFromCycle = kro200.getDistanceMatrix().get(fromVertexToCycle).get(toVertexToCycle);
             for(int transferredVertexIndex=0; transferredVertexIndex<fromCycle.size(); transferredVertexIndex++) {
                 int transferredVertex = fromCycle.get(transferredVertexIndex);
                 int fromVertexFromCycle;
@@ -349,18 +379,18 @@ class HAE {
                 } else {
                     fromVertexFromCycle = fromCycle.get(transferredVertexIndex-1);
                 }
-                Integer firstCostToCycle = distanceMatrix.get(fromVertexFromCycle).get(transferredVertex);
+                Integer firstCostToCycle = kro200.getDistanceMatrix().get(fromVertexFromCycle).get(transferredVertex);
                 int toVertexFromCycle;
                 if(transferredVertexIndex == fromCycle.size()-1) {
                     toVertexFromCycle = fromCycle.get(0);
                 } else {
                     toVertexFromCycle = fromCycle.get(transferredVertexIndex+1);
                 }
-                Integer secondCostToCycle = distanceMatrix.get(transferredVertex).get(toVertexFromCycle);
-                Integer newCostToCycle = distanceMatrix.get(fromVertexFromCycle).get(toVertexFromCycle);
+                Integer secondCostToCycle = kro200.getDistanceMatrix().get(transferredVertex).get(toVertexFromCycle);
+                Integer newCostToCycle = kro200.getDistanceMatrix().get(fromVertexFromCycle).get(toVertexFromCycle);
 
-                Integer firstCostFromCycle = distanceMatrix.get(fromVertexToCycle).get(transferredVertex);
-                Integer secondCostFromCycle = distanceMatrix.get(transferredVertex).get(toVertexToCycle);
+                Integer firstCostFromCycle = kro200.getDistanceMatrix().get(fromVertexToCycle).get(transferredVertex);
+                Integer secondCostFromCycle = kro200.getDistanceMatrix().get(transferredVertex).get(toVertexToCycle);
                 Integer newCost = firstCostFromCycle + secondCostFromCycle + newCostToCycle;
                 Integer oldCost = oldCostFromCycle + firstCostToCycle + secondCostToCycle;
                 long totalCost = newCost - oldCost;
@@ -393,12 +423,12 @@ class HAE {
             } else {
                 toVertex = cycle.get(i+1);
             }
-            Integer oldCost = distanceMatrix.get(fromVertex).get(toVertex);
+            Integer oldCost = kro200.getDistanceMatrix().get(fromVertex).get(toVertex);
             for(List<Integer> newEdge: edges) {
                 if(newEdge.size() == 1) { //wszczepienie krawedzi
                     int newVertex = newEdge.get(0);
-                    Integer firstCost = distanceMatrix.get(fromVertex).get(newVertex);
-                    Integer secondCost = distanceMatrix.get(newVertex).get(toVertex);
+                    Integer firstCost = kro200.getDistanceMatrix().get(fromVertex).get(newVertex);
+                    Integer secondCost = kro200.getDistanceMatrix().get(newVertex).get(toVertex);
                     Integer newCost = firstCost + secondCost;
                     long totalCost = newCost - oldCost;
 
@@ -411,8 +441,8 @@ class HAE {
                     Integer edgeFirstElement = newEdge.get(0);
                     Integer edgeLastElement = newEdge.get(newEdge.size()-1);
 
-                    Integer firstCost = distanceMatrix.get(fromVertex).get(edgeFirstElement);
-                    Integer secondCost = distanceMatrix.get(edgeLastElement).get(toVertex);
+                    Integer firstCost = kro200.getDistanceMatrix().get(fromVertex).get(edgeFirstElement);
+                    Integer secondCost = kro200.getDistanceMatrix().get(edgeLastElement).get(toVertex);
                     Integer newCost = firstCost + secondCost;
                     long totalCost = newCost - oldCost;
 
@@ -428,8 +458,8 @@ class HAE {
                     edgeFirstElement = newEdgeReversed.get(0);
                     edgeLastElement = newEdgeReversed.get(newEdgeReversed.size()-1);
 
-                    firstCost = distanceMatrix.get(fromVertex).get(edgeFirstElement);
-                    secondCost = distanceMatrix.get(edgeLastElement).get(toVertex);
+                    firstCost = kro200.getDistanceMatrix().get(fromVertex).get(edgeFirstElement);
+                    secondCost = kro200.getDistanceMatrix().get(edgeLastElement).get(toVertex);
                     newCost = firstCost + secondCost;
                     totalCost = newCost - oldCost;
 
